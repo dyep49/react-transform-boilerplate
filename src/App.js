@@ -23,12 +23,7 @@ export class App extends Component {
 
     componentDidMount() {
       var that = this;
-      this.socket.on('test', function(data) {
-        var ori = parseFloat(JSON.parse(data).ori);
-        var oriArray = that.state.data.slice();
-        oriArray.push(ori);
-        that.setState({data: oriArray});
-      })
+      this.socket.on('test', this.updateData.bind(this));     
     }
 
     render() {
@@ -38,5 +33,12 @@ export class App extends Component {
                 <SparklinesSpots />
             </Sparklines>
         );
+    }
+    
+    updateData(data) {
+      var parsedData = JSON.parse(data);
+      this.setState({
+        data: this.state.data.concat([parsedData.ori])
+      })
     }
 }
