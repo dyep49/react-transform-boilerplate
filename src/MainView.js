@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import update from 'react-addons-update';
 import { ChartList } from './App';
 import IO from 'socket.io-client';
 
@@ -6,7 +7,7 @@ export class MainView extends Component {
      
   constructor(props) {
     super(props)
-    this.state = { data: [] };
+    this.state = { data: {} };
   }
 
   componentWillMount() {
@@ -21,15 +22,42 @@ export class MainView extends Component {
   }
 
   updateData(data) {
-    var parsedData = JSON.parse(data);
-    var updatedData = this.state.data.slice()
+    const parsedData = JSON.parse(data);
+    const ori = parsedData.ori;
+    const tagId = parsedData.tag;
+
     
-    if(this.state.data.length > 20) {
-      updatedData.shift();
+    // var updatedOriArray = this.state.data[tagId] ? this.state.data[tagId] : []
+    
+    // updatedOriArray.push(ori);
+
+    // if(updatedOriArray.length > 20) {
+    //   updatedOriArray.shift();
+    // }
+
+    // var updatedData = update(this.state.data, {
+    //   [tagId]: {$set: updatedOriArray}
+    // })
+
+    var updatedData;
+
+    if(this.state.data[tagId]) {
+      updatedData = update(this.state.data, {
+        [tagId]: {$push: [ori] }
+      })
+
+      if(this.state.data[tagId].length > 20) {
+        updatedData = update(updatedData, {
+          [tagId]: {$splice: [[0, 1]]}
+        })
+      }
+    } else {
+      updatedData = update(this.state.data, {
+        [tagId]: {$set: [ori] }
+      })
     }
 
-    updatedData.push(parsedData.ori);
-    console.log(updatedData);
+    
     this.setState({
       data: updatedData
     })

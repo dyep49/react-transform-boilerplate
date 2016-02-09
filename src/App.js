@@ -10,19 +10,20 @@ export class ChartList extends Component {
 
 
     render() {
-        var charts = Array(20).fill().map(function(_, i) {
-          return (
-              <Sparklines key={i} data={this.props.chartData} >
-                  <SparklinesLine color="#1c8cdc" />
-              </Sparklines>
-          );
+      var charts = [];
+      Object.keys(this.props.chartData).forEach(function(key) {
+        charts.push (
+          <Sparklines key={key} limit={20} data={this.props.chartData[key]} >
+            <SparklinesLine color="#1c8cdc" />
+          </Sparklines>
+        )
+      }, this)
 
-        }, this);
-       return (
+      return (
         <div>
           {charts}
         </div>
-       )
+      )
     }
     
 }
