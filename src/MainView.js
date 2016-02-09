@@ -25,42 +25,33 @@ export class MainView extends Component {
     const parsedData = JSON.parse(data);
     const ori = parsedData.ori;
     const tagId = parsedData.tag;
+    const maxDataPoints = 20;
 
-    
-    // var updatedOriArray = this.state.data[tagId] ? this.state.data[tagId] : []
-    
-    // updatedOriArray.push(ori);
-
-    // if(updatedOriArray.length > 20) {
-    //   updatedOriArray.shift();
-    // }
-
-    // var updatedData = update(this.state.data, {
-    //   [tagId]: {$set: updatedOriArray}
-    // })
-
-    var updatedData;
-
-    if(this.state.data[tagId]) {
-      updatedData = update(this.state.data, {
-        [tagId]: {$push: [ori] }
-      })
-
-      if(this.state.data[tagId].length > 20) {
-        updatedData = update(updatedData, {
-          [tagId]: {$splice: [[0, 1]]}
-        })
-      }
-    } else {
-      updatedData = update(this.state.data, {
-        [tagId]: {$set: [ori] }
-      })
+    var updatedData = this.state.data[tagId] ? this.state.data : undefined
+  
+    if(this.state.data[tagId] === undefined) {
+      updatedData = this.createTag(tagId, this.state.data)
     }
 
-    
+    updatedData = this.updateTag(tagId, updatedData, ori, maxDataPoints);
+
     this.setState({
       data: updatedData
     })
+  }
+
+  createTag(tagId, tagsData) {
+    return update(tagsData, { [tagId]: {$set: [] }})
+  }
+
+  updateTag(tagId, tagsData, ori, maxDataPoints) {
+    var updatedData = update(tagsData, { [tagId]: {$push: [ori]}});
+    
+    if(tagsData[tagId].length > maxDataPoints) {
+      updatedData = update(updatedData, {[tagId]: {$splice: [[0,1]]}});
+    }
+
+    return updatedData
   }
   
   render() {
